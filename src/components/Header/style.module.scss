@@ -1,0 +1,41 @@
+.header {
+    background: #fff;
+    border-bottom: 1px solid #e5e7eb;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  
+  .container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0.8rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .logo {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #111827;
+  }
+  
+  .cart {
+    position: relative;
+    font-size: 1.2rem;
+    color: #333;
+  }
+  
+  .badge {
+    position: absolute;
+    top: -6px;
+    right: -10px;
+    background: #2563eb;
+    color: white;
+    border-radius: 10px;
+    font-size: 0.55rem;
+    padding: 0 5px;
+  }
+  

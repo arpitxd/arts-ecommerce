@@ -1,0 +1,25 @@
+/* src/app/globals.scss */
+
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: #f8f9fb;
+  color: #222;
+}
+
+a {
+  color: #2563eb;
+  text-decoration: none;
+}
+
+
+main {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0px;
+  max-width: 1400px;
+  margin: 8px auto;
+  padding: 8px;
+  box-shadow: 0 2px 4px #0000000d;
+}
