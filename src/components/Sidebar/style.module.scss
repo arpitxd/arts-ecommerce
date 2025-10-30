@@ -1,43 +1,105 @@
-.sidebar {
-    width: 220px;
-    background: #fff;
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
-    padding: 12px;
-    height: fit-content;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+.priceRange {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
   
-    .filterTitle {
-      font-size: 16px;
-      margin-bottom: 8px;
-      color: #111827;
-      font-weight:600;
-    }
-  
-    .section {
-      margin-bottom: 12px;
+    .values {
       display: flex;
-      flex-direction: column;
-      gap: 0.4rem;
-  
-      label {
-        font-size: 0.9rem;
-        color: #444;
-      }
-  
-      select {
-        padding: 0.4rem 0.5rem;
-        border: 1px solid #ccc;
-        border-radius: 6px;
-        font-size: 0.9rem;
-        color: #333;
-        outline: none;
-        transition: border-color 0.2s ease;
-  
-        &:focus {
-          border-color: #2563eb;
-        }
-      }
+      justify-content: space-between;
+      font-size: 0.85rem;
+      color: #444;
+      font-weight: 500;
     }
+  
+    /* Give room for thumbs so they don't overlap other elements */
+    .sliderContainer {
+      position: relative;
+      width: 100%;
+      height: 28px; /* was 5px: increase so thumbs fit */
+    }
+  
+    /* Both inputs stacked on top, only thumbs are interactive */
+    input[type="range"] {
+      position: absolute;
+      left: 0;
+      right: 0;
+      width: 100%;
+      height: 28px;           /* match container so thumb stays inside */
+      margin: 0;
+      pointer-events: none;   /* thumbs will re-enable events */
+      -webkit-appearance: none;
+      background: transparent;
+      top: 0;
+    }
+  
+    /* Remove default tracks so only custom track shows */
+    input[type="range"]::-webkit-slider-runnable-track {
+      height: 0;
+      background: transparent;
+      border: 0;
+    }
+    input[type="range"]::-moz-range-track {
+      height: 0;
+      background: transparent;
+      border: 0;
+    }
+  
+    /* Base (grey) track */
+    .sliderTrack {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%); /* center vertically */
+      height: 5px;
+      width: 100%;
+      border-radius: 5px;
+      background: #e5e7eb;
+      z-index: 1;
+    }
+  
+    /* Active (blue) range */
+    .sliderRange {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      height: 5px;
+      border-radius: 5px;
+      background: linear-gradient(to right, #2563eb, #93c5fd);
+      z-index: 2;
+      transition: left 0.08s ease, width 0.08s ease; /* smooth movement */
+    }
+  
+    /* Thumbs – only these receive pointer events */
+    .thumb::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      height: 16px;
+      width: 16px;
+      border-radius: 50%;
+      background: #2563eb;
+      border: 2px solid #fff;
+      cursor: pointer;
+      pointer-events: all;         /* re-enable interaction */
+      position: relative;
+      z-index: 3;
+      transition: transform 0.12s ease;
+    }
+    .thumb::-webkit-slider-thumb:hover { transform: scale(1.08); }
+  
+    .thumb::-moz-range-thumb {
+      height: 16px;
+      width: 16px;
+      border-radius: 50%;
+      background: #2563eb;
+      border: 2px solid #fff;
+      cursor: pointer;
+      pointer-events: all;
+      position: relative;
+      z-index: 3;
+      transition: transform 0.12s ease;
+    }
+    .thumb::-moz-range-thumb:hover { transform: scale(1.08); }
+  
+    /* Ensure right thumb can sit above left when close */
+    .thumbLeft { z-index: 3; }
+    .thumbRight { z-index: 4; }
   }
   

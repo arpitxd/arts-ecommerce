@@ -14,8 +14,8 @@ export default function ProductCard({ product }: { product: any }) {
       />
       <div className={styles.content}>
         <h3 className={styles.title}>{product.title}</h3>
-        <p className={styles.price}>₹{product.price}</p>
         <p className={styles.rating}>⭐ {product.rating}</p>
+        <p className={styles.price}>₹{product.price}</p>
       </div>
     </Link>
   );

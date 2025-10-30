@@ -30,11 +30,16 @@ export default function Home() {
     else if (sortType === "rating") sorted.sort((a, b) => b.rating - a.rating);
     setFiltered(sorted);
   };
-
+  const handlePriceChange = (range: [number, number]) => {
+    const [min, max] = range;
+    const result = products.filter((p) => p.price >= min && p.price <= max);
+    setFiltered(result);
+  };
+  
   return (
     <div className={styles.wrapper}>
       <div className={styles.sidebar}>
-        <Sidebar onFilterChange={handleFilter} onSortChange={handleSort} />
+        <Sidebar onFilterChange={handleFilter} onSortChange={handleSort} onPriceChange={handlePriceChange}/>
       </div>
       <div className={styles.productGrid}>
         {filtered.map((p) => (

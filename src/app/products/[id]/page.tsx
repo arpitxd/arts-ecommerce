@@ -6,7 +6,8 @@ import { useCart } from "@src/context/CartContext";
 import styles from "./style.module.scss";
 
 export default function ProductDetail() {
-  const { id } = useParams();
+  const params = useParams();
+  const id = (params as { id: string }).id;
   const { addToCart } = useCart();
   const [product, setProduct] = useState<any>(null);
 
