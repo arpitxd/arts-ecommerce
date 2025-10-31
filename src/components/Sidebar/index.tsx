@@ -1,124 +1,192 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
+import { useEffect, useState } from "react";
 import styles from "./style.module.scss";
 
-export default function Sidebar({
-    onFilterChange,
-    onSortChange,
-    onPriceChange,
+type SidebarProps = {
+  filters: Record<string, string[]>; // e.g. { category: ["laptops", "fragrances"], brand: ["apple", "samsung"] }
+  onFilterChange: (filterType: string, selected: string[]) => void;
+  minPrice?: number;
+  maxPrice?: number;
+  priceRange?: { min: number; max: number };
+  onPriceChange?: (min: number, max: number) => void;
+};
+
+const FilterSection = ({
+  title,
+  options,
+  selected,
+  onChange,
 }: {
-    onFilterChange: (category: string) => void;
-    onSortChange: (sortType: string) => void;
-    onPriceChange: (range: [number, number]) => void;
-}) {
-    const [category, setCategory] = useState("");
-    const [sort, setSort] = useState("");
-    const [minVal, setMinVal] = useState(0);
-    const [maxVal, setMaxVal] = useState(100000);
+  title: string;
+  options: string[];
+  selected: string[];
+  onChange: (title: string, value: string) => void;
+}) => {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className={styles.filterGroup}>
+      <div className={styles.filterHeader} onClick={() => setOpen((p) => !p)}>
+        <span>{title}</span>
+        <span className={styles.arrow}>{open ? "▲" : "▼"}</span>
+      </div>
+      {open && (
+        <div className={styles.filterBody}>
+          <div
+            className={styles.clearAll}
+            onClick={() => onChange(title, "CLEAR_ALL")}
+          >
+            ✖ Clear all
+          </div>
+          {options.map((opt) => (
+            <label key={opt} className={styles.checkboxLabel}>
+              <input
+                type="checkbox"
+                checked={selected.includes(opt)}
+                onChange={() => onChange(title, opt)}
+              />
+              {opt}
+            </label>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
 
-    const minValRef = useRef<HTMLInputElement>(null);
-    const maxValRef = useRef<HTMLInputElement>(null);
-    const range = useRef<HTMLDivElement>(null);
+export default function Sidebar({ filters, onFilterChange, minPrice = 0, maxPrice = 0, priceRange, onPriceChange }: SidebarProps) {
+  const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
+  const [min, setMin] = useState<number>(priceRange?.min ?? minPrice ?? 0);
+  const [max, setMax] = useState<number>(priceRange?.max ?? maxPrice ?? 0);
 
-    // update colored track
-    useEffect(() => {
-        if (minValRef.current && maxValRef.current && range.current) {
-            const min = Math.min(minVal, maxVal);
-            const max = Math.max(minVal, maxVal);
-            const percent1 = (min / 100000) * 100;
-            const percent2 = (max / 100000) * 100;
-            range.current.style.left = `${percent1}%`;
-            range.current.style.width = `${percent2 - percent1}%`;
-        }
-    }, [minVal, maxVal]);
+  // keep local range in sync with props updates
+  useEffect(() => {
+    const nextMin = (priceRange && typeof priceRange.min === "number" && priceRange.min > 0)
+      ? priceRange.min
+      : minPrice;
+    const nextMax = (priceRange && typeof priceRange.max === "number" && priceRange.max > 0)
+      ? priceRange.max
+      : maxPrice;
+    if (Number.isFinite(nextMin) && Number.isFinite(nextMax)) {
+      setMin(nextMin);
+      setMax(nextMax);
+    }
+  }, [priceRange?.min, priceRange?.max, minPrice, maxPrice]);
+  
 
-    const handlePriceChange = (min: number, max: number) => {
-        const low = Math.min(min, max);
-        const high = Math.max(min, max);
-        onPriceChange([low, high]);
-    };
+  const handleChange = (section: string, value: string) => {
+    setSelectedFilters((prev) => {
+      const current = prev[section] || [];
+      if (value === "CLEAR_ALL") {
+        onFilterChange(section, []); // clear all
+        return { ...prev, [section]: [] };
+      }
 
-    return (
-        <aside className={styles.sidebar}>
-            <span className={styles.filterTitle}>Filters</span>
+      const exists = current.includes(value);
+      const updated = exists
+        ? current.filter((v) => v !== value)
+        : [...current, value];
 
-            <div className={styles.section}>
-                <label>Category</label>
-                <select
-                    value={category}
-                    onChange={(e) => {
-                        setCategory(e.target.value);
-                        onFilterChange(e.target.value);
-                    }}
-                >
-                    <option value="">All</option>
-                    <option value="beauty">Beauty</option>
-                    <option value="fragrances">Fragrances</option>
-                    <option value="furniture">Furniture</option>
-                    <option value="groceries">Groceries</option>
-                    <option value="laptops">Laptops</option>
-                </select>
+      onFilterChange(section, updated);
+      return { ...prev, [section]: updated };
+    });
+  };
+
+  return (
+    <aside className={styles.sidebar}>
+      {/* Price Filter */}
+      <div className={styles.filterGroup}>
+        <div className={styles.filterHeader} onClick={() => {}}>
+          <span>Price</span>
+        </div>
+        <div className={styles.filterBody}>
+          <div className={styles.priceBox}>
+            <div className={styles.rangeRow}>
+              <div className={styles.rangeInputs}>
+                <input
+                  type="number"
+                  value={min}
+                  min={minPrice}
+                  max={max}
+                  onChange={(e) => {
+                    let v = Number(e.target.value);
+                    if (!Number.isFinite(v)) v = minPrice;
+                    if (v < minPrice) v = minPrice;
+                    if (v > max) v = max;
+                    setMin(v);
+                    onPriceChange && onPriceChange(v, max);
+                  }}
+                />
+                <span>-</span>
+                <input
+                  type="number"
+                  value={max}
+                  min={min}
+                  max={maxPrice || 10000}
+                  onChange={(e) => {
+                    let v = Number(e.target.value);
+                    if (!Number.isFinite(v)) v = maxPrice;
+                    if (v > (maxPrice || v)) v = maxPrice || v;
+                    if (v < min) v = min;
+                    setMax(v);
+                    onPriceChange && onPriceChange(min, v);
+                  }}
+                />
+              </div>
             </div>
-
-            {/* ---- PRICE RANGE ---- */}
-            <div className={styles.section}>
-                <label>Price Range</label>
-                <div className={styles.priceRange}>
-                    <div className={styles.values}>
-                        <span>₹{minVal}</span>
-                        <span>₹{maxVal}</span>
-                    </div>
-                    <div className={styles.sliderContainer}>
-                        <input
-                            type="range"
-                            min="0"
-                            max="100000"
-                            value={minVal}
-                            ref={minValRef}
-                            onChange={(e) => {
-                                const val = Math.min(Number(e.target.value), maxVal - 500);
-                                setMinVal(val);
-                                handlePriceChange(val, maxVal);
-                            }}
-                            className={`${styles.thumb} ${styles.thumbLeft}`}
-                        />
-
-                        <input
-                            type="range"
-                            min="0"
-                            max="100000"
-                            value={maxVal}
-                            ref={maxValRef}
-                            onChange={(e) => {
-                                const val = Math.max(Number(e.target.value), minVal + 500);
-                                setMaxVal(val);
-                                handlePriceChange(minVal, val);
-                            }}
-                            className={`${styles.thumb} ${styles.thumbRight}`}
-                        />
-
-                        <div className={styles.sliderTrack} />
-                        <div ref={range} className={styles.sliderRange} />
-                    </div>
-                </div>
+            <div className={styles.sliderWrap}>
+              {(() => {
+                const span = Math.max((maxPrice || 0) - (minPrice || 0), 1);
+                const leftPct = span > 0 ? ((min - (minPrice || 0)) / span) * 100 : 0;
+                const rightPct = span > 0 ? ((max - (minPrice || 0)) / span) * 100 : 0;
+                return (
+                  <div className={styles.dualSlider}>
+                    <div className={styles.track} />
+                    <div
+                      className={styles.range}
+                      style={{ left: `${Math.min(leftPct, rightPct)}%`, width: `${Math.abs(rightPct - leftPct)}%` }}
+                    />
+                    <input
+                      type="range"
+                      min={minPrice}
+                      max={maxPrice || 10000}
+                      value={min}
+                      onChange={(e) => {
+                        const v = Number(e.target.value);
+                        if (v <= max) {
+                          setMin(v);
+                          onPriceChange && onPriceChange(v, max);
+                        }
+                      }}
+                    />
+                    <input
+                      type="range"
+                      min={minPrice}
+                      max={maxPrice || 10000}
+                      value={max}
+                      onChange={(e) => {
+                        const v = Number(e.target.value);
+                        if (v >= min) {
+                          setMax(v);
+                          onPriceChange && onPriceChange(min, v);
+                        }
+                      }}
+                    />
+                  </div>
+                );
+              })()}
             </div>
-
-            <span className={styles.filterTitle}>Sort By</span>
-            <div className={styles.section}>
-                <label>Sort</label>
-                <select
-                    value={sort}
-                    onChange={(e) => {
-                        setSort(e.target.value);
-                        onSortChange(e.target.value);
-                    }}
-                >
-                    <option value="">Default</option>
-                    <option value="price-low-high">Price: Low → High</option>
-                    <option value="price-high-low">Price: High → Low</option>
-                    <option value="rating">Rating</option>
-                </select>
-            </div>
-        </aside>
-    );
+          </div>
+        </div>
+      </div>
+      {Object.keys(filters).map((filterKey) => (
+        <FilterSection
+          key={filterKey}
+          title={filterKey}
+          options={filters[filterKey]}
+          selected={selectedFilters[filterKey] || []}
+          onChange={handleChange}
+        />
+      ))}
+    </aside>
+  );
 }

@@ -1,0 +1,77 @@
+@keyframes shimmer {
+    0%   { background-position: -400px 0; }
+    100% { background-position: 400px 0; }
+  }
+  
+  /* ---- Product Grid Loader ---- */
+  .shimmerGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+    width: 100%;
+  }
+  
+  .card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.04);
+  }
+  
+  .image {
+    width: 100%;
+    height: 150px;
+    border-radius: 6px;
+    background: linear-gradient(
+      90deg,
+      #f0f0f0 25%,
+      #e5e5e5 50%,
+      #f0f0f0 75%
+    );
+    background-size: 800px 100%;
+    animation: shimmer 1.6s infinite linear;
+    margin-bottom: 10px;
+  }
+  
+  .textLine,
+  .textLineShort {
+    height: 12px;
+    border-radius: 4px;
+    background: linear-gradient(
+      90deg,
+      #f0f0f0 25%,
+      #e5e5e5 50%,
+      #f0f0f0 75%
+    );
+    background-size: 800px 100%;
+    animation: shimmer 1.6s infinite linear;
+    margin-bottom: 6px;
+  }
+  
+  .textLineShort {
+    width: 60%;
+  }
+  
+  /* ---- Sidebar Loader ---- */
+  .sidebarLoader {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 10px;
+  }
+  
+  .sidebarBlock {
+    height: 18px;
+    width: 80%;
+    border-radius: 4px;
+    background: linear-gradient(
+      90deg,
+      #f0f0f0 25%,
+      #e5e5e5 50%,
+      #f0f0f0 75%
+    );
+    background-size: 800px 100%;
+    animation: shimmer 1.6s infinite linear;
+  }
+  

@@ -1,52 +1,41 @@
-"use client";
-import { useEffect, useState } from "react";
-import ProductCard from "@src/components/ProductCard";
-import Sidebar from "@src/components/Sidebar";
+import ProductListClient from "./ProductListClient";
 import styles from "./page.module.scss";
 
-export default function Home() {
-  const [products, setProducts] = useState<any[]>([]);
-  const [filtered, setFiltered] = useState<any[]>([]);
+export const metadata = {
+  title: "ArtsStore – Products",
+  description: "Browse products with filters, sorting, and infinite scroll.",
+};
 
-  useEffect(() => {
-    fetch("https://dummyjson.com/products")
-      .then((res) => res.json())
-      .then((data) => {
-        setProducts(data.products);
-        setFiltered(data.products);
-      });
-  }, []);
+const LIMIT = 20;
 
-  const handleFilter = (category: string) => {
-    if (!category) return setFiltered(products);
-    const result = products.filter((p) => p.category === category);
-    setFiltered(result);
-  };
+async function fetchInitialProducts(q: string | undefined, sortBy: string, order: string) {
+  const base = q
+    ? `https://dummyjson.com/products/search?q=${encodeURIComponent(q)}`
+    : `https://dummyjson.com/products`;
+  const params = `limit=${LIMIT}&skip=0&sortBy=${sortBy}&order=${order}`;
+  const res = await fetch(`${base}?${params}`, { cache: "no-store" });
+  const data = await res.json();
+  return data;
+}
 
-  const handleSort = (sortType: string) => {
-    let sorted = [...filtered];
-    if (sortType === "price-low-high") sorted.sort((a, b) => a.price - b.price);
-    else if (sortType === "price-high-low") sorted.sort((a, b) => b.price - a.price);
-    else if (sortType === "rating") sorted.sort((a, b) => b.rating - a.rating);
-    setFiltered(sorted);
-  };
-  const handlePriceChange = (range: [number, number]) => {
-    const [min, max] = range;
-    const result = products.filter((p) => p.price >= min && p.price <= max);
-    setFiltered(result);
-  };
-  
+export default async function Home({ searchParams }: { searchParams?: { q?: string; sortBy?: string; order?: string } }) {
+  const initialQuery = searchParams?.q || "";
+  const initialSortBy = (searchParams?.sortBy as "title" | "price" | "rating") || "title";
+  const initialOrder = (searchParams?.order as "asc" | "desc") || "asc";
+
+  const data = await fetchInitialProducts(initialQuery || undefined, initialSortBy, initialOrder);
+  const initialProducts = Array.isArray(data?.products) ? data.products : [];
+  const total = typeof data?.total === "number" ? data.total : initialProducts.length;
+
   return (
     <div className={styles.wrapper}>
-      <div className={styles.sidebar}>
-        <Sidebar onFilterChange={handleFilter} onSortChange={handleSort} onPriceChange={handlePriceChange}/>
-      </div>
-      <div className={styles.productGrid}>
-        {filtered.map((p) => (
-          <ProductCard key={p.id} product={p} />
-        ))}
-      </div>
+      <ProductListClient
+        initialProducts={initialProducts}
+        initialTotal={total}
+        initialQuery={initialQuery}
+        initialSortBy={initialSortBy}
+        initialOrder={initialOrder}
+      />
     </div>
-
   );
 }
