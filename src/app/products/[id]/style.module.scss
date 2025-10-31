@@ -9,14 +9,19 @@
   }
   
   /* Left image section */
-.imageContainer {
+.leftCol {
   flex: 1;
   min-width: 350px;
+  position: sticky;
+  top: 80px;
+  align-self: flex-start;
+  display: flex;
+  flex-direction: column;
+}
+
+.imageContainer {
   display: flex;
   gap: 12px;
-  position: sticky;
-  top: 80px; /* keep gallery fixed under header */
-  align-self: flex-start;
 }
 
 .thumbs {
@@ -59,6 +64,18 @@
   border-radius: 12px;
   overflow: hidden;
 }
+
+.leftActions {
+  margin-top: 12px;
+  /* align under main image (thumbs = 72px, gap = 12px) */
+  margin-left: 84px;
+  width: calc(100% - 84px);
+}
+
+.leftActions .addButton {
+  display: block;
+  width: 100%;
+}
   
   /* Right details section */
   .details {
@@ -95,6 +112,23 @@
   margin-bottom: 8px;
 }
 
+.specsTable {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  row-gap: 10px;
+  column-gap: 24px;
+}
+
+.specLabel {
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.specValue {
+  color: #111827;
+  font-size: 0.95rem;
+}
+
 .metaGrid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -127,6 +161,39 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+
+.ratingsSummary {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.avgRating {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.distRow {
+  display: grid;
+  grid-template-columns: 20px 1fr 40px;
+  gap: 8px;
+  align-items: center;
+}
+
+.bar {
+  height: 6px;
+  background: #e5e7eb;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.barFill {
+  height: 100%;
+  background: #16a34a;
 }
 
 .reviewItem {
@@ -181,6 +248,55 @@
     margin: 0;
     font-weight: 500;
   }
+
+/* Header stats row (rating + counts) */
+.statsRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ratingBadge {
+  background: #16a34a;
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 2px 8px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.muted {
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #d1d5db;
+}
+
+.priceRow {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 6px 0 10px 0;
+}
+
+.mrp {
+  color: #6b7280;
+  text-decoration: line-through;
+  font-size: 0.95rem;
+}
+
+.offer {
+  color: #16a34a;
+  font-weight: 600;
+}
   
   .addButton {
     background: #2563eb;
@@ -195,6 +311,11 @@
     &:hover {
       background: #1d4ed8;
     }
+
+  &:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+  }
   }
   
   /* Responsive layout */

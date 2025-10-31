@@ -40,7 +40,7 @@ export default function Gallery({ images, title }: { images: string[]; title: st
             alt={title}
             width={600}
             height={600}
-            style={{ objectFit: "cover" }}
+            style={{ objectFit: "contain", width: "100%", height: "100%" }}
             priority
           />
         ) : (
