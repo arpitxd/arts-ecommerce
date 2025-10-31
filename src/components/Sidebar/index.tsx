@@ -57,6 +57,7 @@ export default function Sidebar({ filters, onFilterChange, minPrice = 0, maxPric
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
   const [min, setMin] = useState<number>(priceRange?.min ?? minPrice ?? 0);
   const [max, setMax] = useState<number>(priceRange?.max ?? maxPrice ?? 0);
+  const [priceDirty, setPriceDirty] = useState(false);
 
   // keep local range in sync with props updates
   useEffect(() => {
@@ -91,8 +92,73 @@ export default function Sidebar({ filters, onFilterChange, minPrice = 0, maxPric
     });
   };
 
+  const anySelected = Object.values(selectedFilters).some((v) => (v?.length || 0) > 0);
+  const priceDiffers = (min !== minPrice || max !== maxPrice);
+
   return (
     <aside className={styles.sidebar}>
+      {/* Selected chips (only when some filter is active) */}
+      {(anySelected || (priceDirty && priceDiffers)) && (
+        <>
+          <div className={styles.chipsHeader}>
+            <span className={styles.chipsTitle}>Filters</span>
+            {(anySelected || (priceDirty && priceDiffers)) && (
+              <span
+                className={styles.clearLink}
+                onClick={() => {
+                  // clear all section filters
+                  const keys = Object.keys(selectedFilters);
+                  keys.forEach((k) => onFilterChange(k, []));
+                  setSelectedFilters({});
+                  // reset price only if it was changed
+                  if (priceDirty) {
+                    setMin(minPrice);
+                    setMax(maxPrice);
+                    onPriceChange && onPriceChange(minPrice, maxPrice);
+                    setPriceDirty(false);
+                  }
+                }}
+              >
+                CLEAR ALL
+              </span>
+            )}
+          </div>
+          <div className={styles.chipsWrap}>
+            {/* price chip - only after user interaction */}
+            {priceDirty && priceDiffers && (
+              <span className={styles.chip}>
+                {`${min}-${max === maxPrice ? `${max}+` : max}`}
+                <button
+                  aria-label="clear price"
+                  onClick={() => {
+                    setMin(minPrice);
+                    setMax(maxPrice);
+                    onPriceChange && onPriceChange(minPrice, maxPrice);
+                    setPriceDirty(false);
+                  }}
+                >
+                  ✕
+                </button>
+              </span>
+            )}
+
+            {Object.entries(selectedFilters).flatMap(([section, values]) =>
+              values.map((val) => (
+                <span key={`${section}:${val}`} className={styles.chip}>
+                  {val}
+                  <button
+                    aria-label={`remove ${val}`}
+                    onClick={() => handleChange(section, val)}
+                  >
+                    ✕
+                  </button>
+                </span>
+              ))
+            )}
+          </div>
+        </>
+      )}
+
       {/* Price Filter */}
       <div className={styles.filterGroup}>
         <div className={styles.filterHeader} onClick={() => {}}>
@@ -114,6 +180,7 @@ export default function Sidebar({ filters, onFilterChange, minPrice = 0, maxPric
                     if (v > max) v = max;
                     setMin(v);
                     onPriceChange && onPriceChange(v, max);
+                    setPriceDirty(true);
                   }}
                 />
                 <span>-</span>
@@ -129,6 +196,7 @@ export default function Sidebar({ filters, onFilterChange, minPrice = 0, maxPric
                     if (v < min) v = min;
                     setMax(v);
                     onPriceChange && onPriceChange(min, v);
+                    setPriceDirty(true);
                   }}
                 />
               </div>
@@ -155,6 +223,7 @@ export default function Sidebar({ filters, onFilterChange, minPrice = 0, maxPric
                         if (v <= max) {
                           setMin(v);
                           onPriceChange && onPriceChange(v, max);
+                          setPriceDirty(true);
                         }
                       }}
                     />
@@ -168,6 +237,7 @@ export default function Sidebar({ filters, onFilterChange, minPrice = 0, maxPric
                         if (v >= min) {
                           setMax(v);
                           onPriceChange && onPriceChange(min, v);
+                          setPriceDirty(true);
                         }
                       }}
                     />

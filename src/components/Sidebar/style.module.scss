@@ -47,6 +47,51 @@
     animation: fadeIn 0.2s ease-in-out;
   }
 
+.chipsHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.chipsTitle {
+  font-weight: 700;
+  color: #111827;
+}
+
+.clearLink {
+  color: #2563eb;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.chipsWrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background: #f3f4f6;
+  color: #111827;
+  border-radius: 8px;
+  font-size: 0.85rem;
+}
+
+.chip button {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: #6b7280;
+}
+
 .priceBox {
   display: flex;
   flex-direction: column;
