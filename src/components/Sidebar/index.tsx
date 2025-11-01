@@ -1,57 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
 import styles from "./style.module.scss";
-
-type SidebarProps = {
-  filters: Record<string, string[]>; // e.g. { category: ["laptops", "fragrances"], brand: ["apple", "samsung"] }
-  onFilterChange: (filterType: string, selected: string[]) => void;
-  minPrice?: number;
-  maxPrice?: number;
-  priceRange?: { min: number; max: number };
-  onPriceChange?: (min: number, max: number) => void;
-};
-
-const FilterSection = ({
-  title,
-  options,
-  selected,
-  onChange,
-}: {
-  title: string;
-  options: string[];
-  selected: string[];
-  onChange: (title: string, value: string) => void;
-}) => {
-  const [open, setOpen] = useState(false);
-  return (
-    <div className={styles.filterGroup}>
-      <div className={styles.filterHeader} onClick={() => setOpen((p) => !p)}>
-        <span>{title}</span>
-        <span className={styles.arrow}>{open ? "▲" : "▼"}</span>
-      </div>
-      {open && (
-        <div className={styles.filterBody}>
-          <div
-            className={styles.clearAll}
-            onClick={() => onChange(title, "CLEAR_ALL")}
-          >
-            ✖ Clear all
-          </div>
-          {options.map((opt) => (
-            <label key={opt} className={styles.checkboxLabel}>
-              <input
-                type="checkbox"
-                checked={selected.includes(opt)}
-                onChange={() => onChange(title, opt)}
-              />
-              {opt}
-            </label>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-};
+import FilterSection from "./FilterSection";
+import { SidebarProps } from "./types";
 
 export default function Sidebar({ filters, onFilterChange, minPrice = 0, maxPrice = 0, priceRange, onPriceChange }: SidebarProps) {
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
